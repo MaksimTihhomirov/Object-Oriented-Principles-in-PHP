@@ -1,34 +1,32 @@
 
 <?php
 
-class Playlist
+class Song
 {
-    public $name;
-    public $songs;
-
-    public function __construct($name, $songs)
-    {
-        $this->name = $name;
-        $this->songs = $songs;
+    public function __construct(
+        public string $name,
+        public string $artist
+    ) {
     }
 }
 
-$playlists = [];
+class Playlist
+{
+    public function __construct(
+        public string $name,
+        public array $songs
+    ) {
+    }
+}
 
-$playlists[] = new Playlist('80s Headbangers', [
-    'Back in Black',
-    'Are You Ready',
-    'Welcome to the Jungle'
-]);
+$songs = [
+    new Song('My Heart Will Go On', 'Celine Dion'),
+    new Song('Back in Black', 'AC/DC'),
+    new Song('Are You Ready', 'AC/DC'),
+];
 
-$playlists[] = new Playlist('Depressing 90s', [
-    'Creep',
-    'Wonderwall'
-]);
+$playlist = new Playlist('90s Movie Soundtracks', $songs);
 
-$playlists[] = new Playlist('Boy-band Faves', [
-    'I Want It That Way',
-    'Bye Bye Bye'
-]);
-
-var_dump($playlists);
+foreach ($playlist->songs as $song) {
+    echo $song->name . ' - ' . $song->artist . PHP_EOL;
+}
