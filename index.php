@@ -1,33 +1,52 @@
 
 <?php
 
-class User
+interface BillingPortal
 {
-    public string $email {
-        get => str_replace('@', '(at)', $this->email);
+    public function getCustomer();
+    public function getSubscription();
+}
 
-        set {
-            if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidArgumentException('Email must be valid.');
-            }
-
-            $this->email = $value;
-        }
+class StripeBillingPortal implements BillingPortal
+{
+    public function getCustomer()
+    {
+        return 'Stripe customer';
     }
 
-    public function __construct(string $email)
+    public function getSubscription()
     {
-        $this->email = $email;
-    }
-
-    public function updateEmail(string $email): void
-    {
-        $this->email = $email;
+        return 'Stripe subscription';
     }
 }
 
-$user = new User('jeffrey@laracasts.com');
+class Subscription
+{
+    public function __construct(
+        protected BillingPortal $billingPortal
+    ) {
+    }
 
-$user->updateEmail('max@example.com');
+    public function create()
+    {
+        return $this->billingPortal->getCustomer();
+    }
 
-echo $user->email;
+    public function cancel()
+    {
+    }
+
+    public function swap(string $newPlan)
+    {
+    }
+
+    public function invoice()
+    {
+    }
+}
+
+$subscription = new Subscription(
+    new StripeBillingPortal()
+);
+
+echo $subscription->create();
