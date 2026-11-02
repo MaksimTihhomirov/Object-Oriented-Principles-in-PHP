@@ -1,40 +1,33 @@
 
 <?php
 
-// Encapsulation: Restriction of access to an object's internals.
-
-class Person
+class User
 {
-    public function __construct(
-        public string $name,
-        private string $email
-    ) {
+    public string $email {
+        get => str_replace('@', '(at)', $this->email);
+
+        set {
+            if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException('Email must be valid.');
+            }
+
+            $this->email = $value;
+        }
     }
 
-    public function getEmail(): string
+    public function __construct(string $email)
     {
-        return $this->email;
+        $this->email = $email;
     }
 
-    public function job(): string
+    public function updateEmail(string $email): void
     {
-        return 'Software Developer';
-    }
-
-    public function favoriteTeam(): string
-    {
-        return 'Real Madrid';
-    }
-
-    protected function thingsThatKeepUpAtNight(): string
-    {
-        return 'Bob is afraid of dying';
+        $this->email = $email;
     }
 }
 
-$bob = new Person('Bob', 'bob@example.com');
+$user = new User('jeffrey@laracasts.com');
 
-echo "Name: " . $bob->name . PHP_EOL;
-echo "Email: " . $bob->getEmail() . PHP_EOL;
-echo "Job: " . $bob->job() . PHP_EOL;
-echo "Favorite team: " . $bob->favoriteTeam() . PHP_EOL;
+$user->updateEmail('max@example.com');
+
+echo $user->email;
