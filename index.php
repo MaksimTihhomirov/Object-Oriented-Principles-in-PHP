@@ -1,60 +1,40 @@
 
 <?php
 
-interface CanBeLiked
+// Encapsulation: Restriction of access to an object's internals.
+
+class Person
 {
-    public function like(): void;
-
-    public function isLiked(): bool;
-}
-
-class Comment implements CanBeLiked
-{
-    private bool $liked = false;
-
-    public function like(): void
-    {
-        $this->liked = true;
-
-        echo "Like the comment\n";
+    public function __construct(
+        public string $name,
+        private string $email
+    ) {
     }
 
-    public function isLiked(): bool
+    public function getEmail(): string
     {
-        return $this->liked;
-    }
-}
-
-class Thread implements CanBeLiked
-{
-    private bool $liked = false;
-
-    public function like(): void
-    {
-        $this->liked = true;
-
-        echo "Like the thread\n";
+        return $this->email;
     }
 
-    public function isLiked(): bool
+    public function job(): string
     {
-        return $this->liked;
+        return 'Software Developer';
+    }
+
+    public function favoriteTeam(): string
+    {
+        return 'Real Madrid';
+    }
+
+    protected function thingsThatKeepUpAtNight(): string
+    {
+        return 'Bob is afraid of dying';
     }
 }
 
-class PerformLike
-{
-    public function handle(CanBeLiked $model): void
-    {
-        if ($model->isLiked()) {
-            return;
-        }
+$bob = new Person('Bob', 'bob@example.com');
 
-        $model->like();
-    }
-}
-
-$performLike = new PerformLike();
-
-$performLike->handle(new Comment());
-$performLike->handle(new Thread());
+echo "Name: " . $bob->name . PHP_EOL;
+echo "Email: " . $bob->getEmail() . PHP_EOL;
+echo "Job: " . $bob->job() . PHP_EOL;
+echo "Favorite team: " . $bob->favoriteTeam() . PHP_EOL;
