@@ -1,55 +1,71 @@
 
 <?php
 
+// Inheritance
+
+class Notification
+{
+    public function __construct(
+        public string $message
+    ) {}
+
+    public function send(): void
+    {
+        echo "Show pop up flash message: {$this->message}\n";
+    }
+}
+
+class EmailNotification extends Notification
+{
+    public function send(): void
+    {
+        echo "Fire off an email notification: {$this->message}\n";
+    }
+}
+
+$notification = new EmailNotification('Here is my notification');
+$notification->send();
+
+echo "\n";
+
+// Abstract Classes
+
 class User
 {
-    public string $email = 'test@example.com';
-    public bool $subscribed = false;
+    public function __construct(
+        public int $postsCount = 0
+    ) {}
+}
 
-    public function update(array $attributes): void
+abstract class Achievement
+{
+    public function __construct(
+        public string $name,
+        public string $description,
+        public string $icon
+    ) {}
+
+    abstract public function qualifier(User $user): bool;
+}
+
+class FirstPostAchievement extends Achievement
+{
+    public function qualifier(User $user): bool
     {
-        $this->subscribed = $attributes['subscribed'];
+        return $user->postsCount >= 1;
     }
 }
 
-interface NewsletterProvider
-{
-    public function addToList(string $list, string $email): void;
-}
+$user = new User(1);
 
-class CampaignMonitorProvider implements NewsletterProvider
-{
-    public function addToList(string $list, string $email): void
-    {
-        echo "Campaign Monitor: {$email} added to {$list}\n";
-    }
-}
+$firstPost = new FirstPostAchievement(
+    'First Post',
+    'Create your first post',
+    'star'
+);
 
-class PostmarkProvider implements NewsletterProvider
-{
-    public function addToList(string $list, string $email): void
-    {
-        echo "Postmark: {$email} added to {$list}\n";
-    }
-}
+echo "Achievement: {$firstPost->name}\n";
 
-class Newsletter
-{
-    public function subscribe(
-        User $user,
-        NewsletterProvider $provider
-    ): bool {
-        $provider->addToList('default', $user->email);
-
-        $user->update(['subscribed' => true]);
-
-        return true;
-    }
-}
-
-$user = new User();
-$newsletter = new Newsletter();
-
-$newsletter->subscribe($user, new PostmarkProvider());
-
-echo "\nSubscribed: " . ($user->subscribed ? 'Yes' : 'No');
+echo $firstPost->qualifier($user)
+    ? "Achievement unlocked!\n"
+    : "Achievement locked!\n";
