@@ -1,71 +1,60 @@
 
 <?php
 
-// Inheritance
-
-class Notification
+interface CanBeLiked
 {
-    public function __construct(
-        public string $message
-    ) {}
+    public function like(): void;
 
-    public function send(): void
+    public function isLiked(): bool;
+}
+
+class Comment implements CanBeLiked
+{
+    private bool $liked = false;
+
+    public function like(): void
     {
-        echo "Show pop up flash message: {$this->message}\n";
+        $this->liked = true;
+
+        echo "Like the comment\n";
+    }
+
+    public function isLiked(): bool
+    {
+        return $this->liked;
     }
 }
 
-class EmailNotification extends Notification
+class Thread implements CanBeLiked
 {
-    public function send(): void
+    private bool $liked = false;
+
+    public function like(): void
     {
-        echo "Fire off an email notification: {$this->message}\n";
+        $this->liked = true;
+
+        echo "Like the thread\n";
+    }
+
+    public function isLiked(): bool
+    {
+        return $this->liked;
     }
 }
 
-$notification = new EmailNotification('Here is my notification');
-$notification->send();
-
-echo "\n";
-
-// Abstract Classes
-
-class User
+class PerformLike
 {
-    public function __construct(
-        public int $postsCount = 0
-    ) {}
-}
-
-abstract class Achievement
-{
-    public function __construct(
-        public string $name,
-        public string $description,
-        public string $icon
-    ) {}
-
-    abstract public function qualifier(User $user): bool;
-}
-
-class FirstPostAchievement extends Achievement
-{
-    public function qualifier(User $user): bool
+    public function handle(CanBeLiked $model): void
     {
-        return $user->postsCount >= 1;
+        if ($model->isLiked()) {
+            return;
+        }
+
+        $model->like();
     }
 }
 
-$user = new User(1);
+$performLike = new PerformLike();
 
-$firstPost = new FirstPostAchievement(
-    'First Post',
-    'Create your first post',
-    'star'
-);
-
-echo "Achievement: {$firstPost->name}\n";
-
-echo $firstPost->qualifier($user)
-    ? "Achievement unlocked!\n"
-    : "Achievement locked!\n";
+$performLike->handle(new Comment());
+$performLike->handle(new Thread());
