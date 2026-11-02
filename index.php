@@ -1,32 +1,55 @@
 
 <?php
 
-class Song
+class User
 {
-    public function __construct(
-        public string $name,
-        public string $artist
-    ) {
+    public string $email = 'test@example.com';
+    public bool $subscribed = false;
+
+    public function update(array $attributes): void
+    {
+        $this->subscribed = $attributes['subscribed'];
     }
 }
 
-class Playlist
+interface NewsletterProvider
 {
-    public function __construct(
-        public string $name,
-        public array $songs
-    ) {
+    public function addToList(string $list, string $email): void;
+}
+
+class CampaignMonitorProvider implements NewsletterProvider
+{
+    public function addToList(string $list, string $email): void
+    {
+        echo "Campaign Monitor: {$email} added to {$list}\n";
     }
 }
 
-$songs = [
-    new Song('My Heart Will Go On', 'Celine Dion'),
-    new Song('Back in Black', 'AC/DC'),
-    new Song('Are You Ready', 'AC/DC'),
-];
-
-$playlist = new Playlist('90s Movie Soundtracks', $songs);
-
-foreach ($playlist->songs as $song) {
-    echo $song->name . ' - ' . $song->artist . PHP_EOL;
+class PostmarkProvider implements NewsletterProvider
+{
+    public function addToList(string $list, string $email): void
+    {
+        echo "Postmark: {$email} added to {$list}\n";
+    }
 }
+
+class Newsletter
+{
+    public function subscribe(
+        User $user,
+        NewsletterProvider $provider
+    ): bool {
+        $provider->addToList('default', $user->email);
+
+        $user->update(['subscribed' => true]);
+
+        return true;
+    }
+}
+
+$user = new User();
+$newsletter = new Newsletter();
+
+$newsletter->subscribe($user, new PostmarkProvider());
+
+echo "\nSubscribed: " . ($user->subscribed ? 'Yes' : 'No');
