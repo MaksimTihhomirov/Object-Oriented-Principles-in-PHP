@@ -1,52 +1,14 @@
 
 <?php
 
-interface BillingPortal
-{
-    public function getCustomer();
-    public function getSubscription();
-}
+require 'FileStorage.php';
+require 'LocalStorage.php';
+require 'S3Storage.php';
+require 'Storage.php';
 
-class StripeBillingPortal implements BillingPortal
-{
-    public function getCustomer()
-    {
-        return 'Stripe customer';
-    }
+$storage = Storage::resolve();
 
-    public function getSubscription()
-    {
-        return 'Stripe subscription';
-    }
-}
-
-class Subscription
-{
-    public function __construct(
-        protected BillingPortal $billingPortal
-    ) {
-    }
-
-    public function create()
-    {
-        return $this->billingPortal->getCustomer();
-    }
-
-    public function cancel()
-    {
-    }
-
-    public function swap(string $newPlan)
-    {
-    }
-
-    public function invoice()
-    {
-    }
-}
-
-$subscription = new Subscription(
-    new StripeBillingPortal()
+$storage->put(
+    'one/two/three/test.txt',
+    'Hello World!'
 );
-
-echo $subscription->create();
